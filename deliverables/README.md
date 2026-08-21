@@ -9,6 +9,20 @@
 | Trần Kiên | `2A202601598` |
 | Nguyễn Phú Quang | `2A202602017` |
 
+## Repo nhóm và gói nộp cá nhân
+
+Nhóm dùng **một repo/branch chung** để tạo dataset, chạy tutor/judge, lưu evidence và
+chốt cùng một product verdict. Tuy nhiên, cấu trúc `Track1_Day21_MHV_HoVaTen/`, phần
+“đóng góp của tôi” và yêu cầu AI Support Log của **mỗi thành viên** cho thấy gói nộp
+cuối được chuẩn bị theo từng cá nhân:
+
+- Hai thành viên dùng chung `deliverables/REPORT.md` và `deliverables/evidence/` đã
+  đồng thuận; không tạo hai bộ số liệu hoặc hai verdict mâu thuẫn.
+- Mỗi người đổi tên thư mục theo mã/họ tên của mình, viết phần đóng góp cá nhân và
+  có AI Support Log phản ánh đúng việc người đó đã dùng AI.
+- Nếu hệ thống lớp chỉ nhận một link repo cho cả nhóm, dùng branch chung này làm
+  nguồn; hai gói cá nhân vẫn phải giữ thông tin và AI log của đúng người nộp.
+
 **Nguyên tắc bắt buộc:** mỗi bước của eval loop phải nộp đủ ba thứ —
 **đầu vào** (bạn cho gì vào), **đầu ra** (hệ thống trả gì ra — file data thô),
 và **quyết định** (bạn kết luận/lựa chọn gì ở bước đó, VÌ SAO). Thiếu một trong ba,

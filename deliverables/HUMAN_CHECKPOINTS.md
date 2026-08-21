@@ -27,10 +27,10 @@ python eval/report.py
 ```
 
 - [x] Trần Kiên đã chấm độc lập 25/25 row; file `labels-tran-kien.csv` hợp lệ.
-- [ ] Nguyễn Phú Quang chấm độc lập cùng 25 row, không xem nhãn của Trần Kiên.
-- [ ] Nhận `labels-nguyen-phu-quang.csv`.
-- [ ] Chạy `python eval/agreement.py labels-tran-kien.csv labels-nguyen-phu-quang.csv`.
-- [ ] Ghi agreement trước đồng thuận và từng disagreement case.
+- [x] Nguyễn Phú Quang đã chấm độc lập cùng 25 row.
+- [x] Đã nhận và chuẩn hóa tên file `labels-nguyen-phu-quang.csv`.
+- [x] Đã chạy `python eval/agreement.py labels-tran-kien.csv labels-nguyen-phu-quang.csv`.
+- [x] Agreement trước đồng thuận: 23/25 = 92%; disagreement: `sc-c13-a`, `sc-c20-a`.
 - [ ] Đồng thuận `labels.csv`; không để AI gắn nhãn.
 - [ ] Nếu calibrate judge theo từng tiêu chí, tạo gold files tương ứng
   `labels-groundedness.csv` và `labels-followup.csv` từ quyết định human.
@@ -45,6 +45,8 @@ python eval/judge.py --prompt eval/judge_prompts/followup-quality-v1.md --output
 
 - [x] Đã chạy code checks trên `results-v1.jsonl`: schema 24/25; citation ID 24/24;
   quote-verbatim 7/24; scope/source contract 24/24; follow-up contract 24/24.
+- [ ] Hai thành viên xác nhận 17 quote mismatches là lỗi tutor hay false positive của
+  rule; human labels không được tự động sửa theo code check.
 - [ ] Lưu confusion matrix, TPR/TNR và disagreement pattern judge vòng 1.
 - [ ] Mỗi lần chỉ sửa một yếu tố prompt; lưu prompt/verdicts trước khi chạy lại.
 - [ ] Chạy tối thiểu hai vòng mỗi judge.

@@ -170,8 +170,12 @@ python eval/judge.py --prompt eval/judge_prompts/followup-quality-v1.md --output
 > cho việc đó.
 
 - Trần Kiên đã **gán nhãn tay 25/25 row**: 23 pass, 1 fail, 1 uncertain. Đây mới là
-  một rater độc lập; chưa được gọi là gold labels cho tới khi Nguyễn Phú Quang chấm
-  xong và nhóm xử lý disagreement.
+  một rater độc lập. Nguyễn Phú Quang đã chấm cùng 25 row: 22 pass, 3 fail.
+- Human–human agreement trước đồng thuận: **23/25 = 92%**. Hai disagreement là
+  `sc-c13-a` (uncertain/fail) và `sc-c20-a` (pass/fail). Evidence:
+  `deliverables/evidence/human-agreement-v1.md`.
+- Chưa được gọi là gold labels cho tới khi hai thành viên tự thảo luận hai case trên
+  và ghi quyết định vào `labels.csv`.
 - Chạy `python3 eval/judge.py`: **agreement** giữa judge và nhãn người là bao nhiêu %? Dán
   confusion matrix vào đây.
 - Judge **sai ở đâu**? (chặt quá / lỏng quá / lệch ở nhóm câu nào — in-scope hay
@@ -241,8 +245,8 @@ threshold được khóa trước candidate tiếp theo hoặc calibration evide
 
 #### 2. Quá trình đồng thuận của con người
 
-- Agreement vòng độc lập (nhãn tổng): ___% — kèm thống kê từ note: tiêu chí nào gây bất đồng nhiều nhất
-- Mâu thuẫn lớn nhất: (case/tiêu chí nào, hai phía nghĩ gì)
+- Agreement vòng độc lập (nhãn tổng): **92% (23/25)**.
+- Mâu thuẫn cần xử lý: `sc-c13-a` (uncertain/fail) và `sc-c20-a` (pass/fail).
 - Nhóm xử lý bằng cách nào: (siết định nghĩa / đổi thang / bỏ tiêu chí...)
 
 #### 3. LLM judge

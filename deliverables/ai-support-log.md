@@ -17,6 +17,7 @@
 | 2 | Phase 1 — paraphrase | Viết 25 natural-language inputs từ 15 combinations đã chọn và chuẩn hóa JSONL | Human yêu cầu triển khai tiếp; file được parse, 25/25 ID unique; nhóm vẫn cần đọc chéo |
 | 3 | Phase 3–4 — evaluator draft | Brainstorm hai code checks, rubric/routing draft và hai single-criterion judge prompts | 48 offline tests pass; judge chưa được tin cho tới khi calibrate với gold labels |
 | 4 | Report draft | Điền phần có evidence thật và đánh dấu checkpoint thiếu | Không điền agreement, threshold, calibration result hoặc verdict khi chưa có số liệu |
+| 5 | Phase 2 — agreement assist | Chuẩn hóa tên CSV, kiểm tra đủ 25 ID và chạy `agreement.py` | AI chỉ ghi lại 92% và hai disagreement; hai thành viên tự chốt gold labels |
 
 - Phần AI gợi ý đã bác bỏ: `C01, C02, C09, C10, C12`. **Nhóm bổ sung lý do
   reject cụ thể trước khi nộp.**
