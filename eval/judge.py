@@ -96,8 +96,13 @@ def judge_row(rec, template, criterion="unspecified"):
 def print_confusion(verdicts, labels):
     """Ma trận nhầm lẫn judge (hàng) vs nhãn người (cột) + tỉ lệ đồng thuận."""
     classes = ["pass", "fail", "uncertain"]
+    infra_errors = [v for v in verdicts if v.get("error")]
     pairs = [(v["verdict"], labels[v["scenario_id"]])
-             for v in verdicts if v["scenario_id"] in labels]
+             for v in verdicts
+             if not v.get("error") and v["scenario_id"] in labels]
+    if infra_errors:
+        print("\nLoại %d row lỗi hạ tầng khỏi confusion matrix: %s" %
+              (len(infra_errors), ", ".join(v["scenario_id"] for v in infra_errors)))
     if not pairs:
         print("\nlabels.csv chưa có nhãn nào trùng scenario_id -> chưa tính được agreement.")
         print("Mở report.html, gán nhãn rồi bấm 'Export labels.csv' để có nhãn người.")

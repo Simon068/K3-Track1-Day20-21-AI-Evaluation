@@ -66,6 +66,10 @@ check("JSON có newline thật trong string -> parse lỏng được",
       raw_nl.get("answer") == "dòng 1\ndòng 2" and not raw_nl.get("_parse_error"))
 really_broken = tutor.parse_json_content('{"a": 1, "b": }')
 check("JSON sai cú pháp thật -> vẫn _parse_error", really_broken.get("_parse_error") is True)
+check("chat response có choices hợp lệ", tutor.chat_response_error(
+      {"choices": [{"message": {"content": "{}"}}]}) is None)
+check("chat response thiếu choices báo lỗi rõ", "không có choices" in
+      tutor.chat_response_error({"error": {"message": "provider unavailable"}}))
 
 print("== Tầng 5: slide context ==")
 check("slide None -> rỗng", tutor.format_slide_context(None) == "")

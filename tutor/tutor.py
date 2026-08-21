@@ -180,6 +180,21 @@ def retrieve_corpus(question, top_k=4, sections=None):
     return [s for score, s in scored[:top_k] if score > 0]
 
 # --- Gọi LLM chat completion (OpenAI-compatible) qua thư viện requests
+def chat_response_error(data):
+    """None nếu response chat hợp lệ; ngược lại trả mô tả lỗi an toàn."""
+    if not isinstance(data, dict):
+        return "body không phải JSON object"
+    choices = data.get("choices")
+    if isinstance(choices, list) and choices:
+        return None
+    provider_error = data.get("error")
+    if isinstance(provider_error, dict):
+        message = provider_error.get("message") or provider_error.get("code")
+    else:
+        message = provider_error
+    return "response không có choices" + (f": {message}" if message else "")
+
+
 def chat(messages, model=None, temperature=0, max_tokens=800, tools=None,
          reasoning_effort=None):
     model = model or MODEL
@@ -214,11 +229,18 @@ def chat(messages, model=None, temperature=0, max_tokens=800, tools=None,
                              headers={"Authorization": "Bearer " + key})
         resp.raise_for_status()
         try:
-            return resp.json(), time.time() - t0
+            data = resp.json()
         except ValueError as e:
             last_err = e
             time.sleep(1)
-    raise RuntimeError(f"Provider trả body không parse được JSON sau 3 lần thử: {last_err}")
+            continue
+        response_error = chat_response_error(data)
+        if response_error is None:
+            return data, time.time() - t0
+        last_err = RuntimeError(response_error)
+        if attempt < 2:
+            time.sleep(1)
+    raise RuntimeError(f"Provider trả response chat không hợp lệ sau 3 lần thử: {last_err}")
 
 def parse_json_content(content):
     """Model đôi khi bọc JSON trong ``` fence — lột ra trước khi parse.
