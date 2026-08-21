@@ -13,7 +13,7 @@ scenario_id,label,note
 "sc-c08-b","pass",""
 "sc-c11-a","pass",""
 "sc-c11-b","pass",""
-"sc-c13-a","uncertain","uncertain: scope — đã từ chối giá hiện hành nhưng vẫn đưa claim < $30/1M tokens không có source"
+"sc-c13-a","uncertain","scope — đã từ chối giá hiện hành nhưng vẫn đưa claim < $30/1M tokens không có source"
 "sc-c13-b","pass",""
 "sc-c14-a","pass",""
 "sc-c14-b","pass",""

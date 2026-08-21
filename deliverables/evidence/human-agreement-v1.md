@@ -16,8 +16,8 @@ python eval/agreement.py labels-tran-kien.csv labels-nguyen-phu-quang.csv
 
 | scenario_id | Trần Kiên | Nguyễn Phú Quang | Trạng thái |
 |---|---|---|---|
-| `sc-c13-a` | uncertain | fail | Chờ hai thành viên thảo luận và ghi lý do mỗi phía |
-| `sc-c20-a` | pass | fail | Chờ hai thành viên thảo luận và ghi lý do mỗi phía |
+| `sc-c04-a` | fail | pass | JSON raw bị vỡ do quote không escape; một người coi đây là schema blocker |
+| `sc-c13-a` | uncertain | pass | Một người chấp nhận boundary, một người giữ uncertain vì claim không source |
 
 ## Quyết định sau đồng thuận
 
