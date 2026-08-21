@@ -131,6 +131,8 @@ Model viết dạng `provider/model` — repo gọi **thẳng API chuẩn của 
 |---|---|---|
 | `EVAL_MODEL` | `deepseek/deepseek-v4-flash` | Model của tutor |
 | `EVAL_JUDGE_MODEL` | `openai/gpt-4o-mini` | Model của judge (nên KHÁC tutor — tránh tự chấm chéo) |
+| `EVAL_JUDGE_MAX_TOKENS` | `2000` | Budget output judge; reasoning model cần đủ chỗ trước khi trả JSON |
+| `EVAL_JUDGE_REASONING_EFFORT` | tự chọn (`minimal` cho OpenRouter GPT-5) | Giới hạn effort để tránh reasoning ăn hết output budget |
 | `BRAINTRUST_API_KEY` | — | Bật log trace lên Braintrust (bắt buộc một trong hai khi nộp bài) |
 | `LANGSMITH_API_KEY` | — | Bật log trace lên LangSmith (thay cho Braintrust; `LANGCHAIN_API_KEY` cũng được) |
 | `EVAL_BASE_URL` + `EVAL_API_KEY` | — (không đặt = gọi thẳng provider) | Tuỳ chọn: gateway OpenAI-compatible riêng |

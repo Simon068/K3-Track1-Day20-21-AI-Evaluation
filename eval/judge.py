@@ -22,6 +22,13 @@ import tracing
 _tracer = tracing.init_tracer()
 
 JUDGE_MODEL = os.environ.get("EVAL_JUDGE_MODEL", "openai/gpt-4o-mini")
+JUDGE_MAX_TOKENS = int(os.environ.get("EVAL_JUDGE_MAX_TOKENS", "2000"))
+_default_reasoning_effort = (
+    "minimal" if JUDGE_MODEL.startswith("openrouter/openai/gpt-5") else None
+)
+JUDGE_REASONING_EFFORT = os.environ.get(
+    "EVAL_JUDGE_REASONING_EFFORT", _default_reasoning_effort
+)
 
 # judge_prompt.md nằm cạnh file này trong eval/ — resolve theo __file__, không theo cwd
 PROMPT_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "judge_prompt.md")
@@ -57,8 +64,22 @@ def build_judge_prompt(rec, template):
 def judge_row(rec, template, criterion="unspecified"):
     prompt = build_judge_prompt(rec, template)
     data, latency = tutor.chat([{"role": "user", "content": prompt}],
-                               model=JUDGE_MODEL, max_tokens=500)
-    content = data["choices"][0]["message"]["content"]
+                               model=JUDGE_MODEL, max_tokens=JUDGE_MAX_TOKENS,
+                               reasoning_effort=JUDGE_REASONING_EFFORT)
+    choice = data["choices"][0]
+    content = (choice.get("message") or {}).get("content")
+    if not isinstance(content, str) or not content.strip():
+        reasoning_tokens = (data.get("usage", {})
+                                .get("completion_tokens_details", {})
+                                .get("reasoning_tokens"))
+        raise RuntimeError(
+            "judge trả content rỗng "
+            f"(finish_reason={choice.get('finish_reason')!r}, "
+            f"reasoning_tokens={reasoning_tokens!r}, "
+            f"max_tokens={JUDGE_MAX_TOKENS}). "
+            "Tăng EVAL_JUDGE_MAX_TOKENS hoặc dùng model judge không tiêu tốn "
+            "toàn bộ budget cho reasoning."
+        )
     out = tutor.parse_json_content(content)
     return {"scenario_id": rec["scenario_id"], "criterion": criterion,
             "verdict": out.get("verdict", "uncertain"),

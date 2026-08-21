@@ -180,7 +180,8 @@ def retrieve_corpus(question, top_k=4, sections=None):
     return [s for score, s in scored[:top_k] if score > 0]
 
 # --- Gọi LLM chat completion (OpenAI-compatible) qua thư viện requests
-def chat(messages, model=None, temperature=0, max_tokens=800, tools=None):
+def chat(messages, model=None, temperature=0, max_tokens=800, tools=None,
+         reasoning_effort=None):
     model = model or MODEL
     base_url, key, model_id = resolve_provider(model)
     if not key:
@@ -192,6 +193,8 @@ def chat(messages, model=None, temperature=0, max_tokens=800, tools=None):
             "(Muốn đi qua gateway riêng? Đặt EVAL_BASE_URL + EVAL_API_KEY.)")
     payload = {"model": model_id, "messages": messages,
                "temperature": temperature, "max_tokens": max_tokens}
+    if reasoning_effort:
+        payload["reasoning"] = {"effort": reasoning_effort}
     if "deepseek-v4" in model:  # bắt buộc với deepseek v4: tắt thinking, nếu không mất output
         payload["thinking"] = {"type": "disabled"}
     # ép JSON: đo thực tế ~20% response không có cờ này bị vỡ JSON giữa chừng.
@@ -222,6 +225,8 @@ def parse_json_content(content):
     JSON vỡ (cắt giữa chừng, sai escape) thì đánh dấu _parse_error thay vì raise.
     strict=False: deepseek hay nhả xuống dòng THẬT (\\n raw) giữa string value —
     JSON chặt không chịu, nhưng nội dung vẫn đọc được nên nới lỏng thay vì fail."""
+    if not isinstance(content, str):
+        return {"_parse_error": True, "raw": content}
     m = re.search(r"\{.*\}", content, re.S)
     if not m:
         return {"_parse_error": True, "raw": content}
