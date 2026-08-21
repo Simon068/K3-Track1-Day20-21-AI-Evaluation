@@ -12,18 +12,35 @@ results-vN.jsonl, labels.csv, judge-prompt-vN.md, verdicts-vN.jsonl, braintrust-
 > Lưới input = trục "ai hỏi" × "hỏi kiểu gì". LLM giúp sinh input, con người kiểm soát
 > coverage. Trả lời các câu hỏi sau rồi vẽ lưới của bạn.
 
-- AI Tutor của bạn phục vụ những **nhóm người dùng** nào? (học viên mới, học viên đang
-  làm bài, học viên ôn lại, PM khác team...?)
-- Mỗi nhóm có những **ý định (intent)** hỏi nào? (hỏi khái niệm, xin ví dụ, hỏi ngoài
-  lề, xin đáp án, hỏi mơ hồ...?)
-- Ô nào trong lưới là **rủi ro cao** nhất (trả lời sai thì hại người học)? Ô nào **tần
-  suất cao** nhất?
+- User được phủ: học viên đang làm lab, học viên đang xem slide, học viên ôn lại và
+  user không cung cấp context/adversarial.
+- Intent được phủ: hỏi khái niệm, so sánh, áp dụng, đọc kết quả, xin đáp án và hỏi
+  ngoài corpus.
+- Nhóm đã human-select ngày 2026-08-21: reject `C01, C02, C09, C10, C12`; keep 15
+  combinations còn lại. File quyết định: `deliverables/COVERAGE_REVIEW.md`.
+- High-risk: kết luận ship từ overall pass rate (`C07`), thay human bằng judge chưa
+  calibrate (`C08`), xin/bịa verdict (`C11`), dữ liệu hiện hành ngoài corpus (`C13`),
+  prompt injection + citation giả (`C14`) và overfit judge (`C20`).
+- Chưa có production traces nên **không tuyên bố frequency distribution**. Các
+  representative case chỉ là giả thuyết cần đối chiếu sau launch/dog-fooding.
+
+### Dimensions đã khóa
+
+| Dimension | Values trong Dataset v1 | Behavior đúng thay đổi |
+|---|---|---|
+| Loại câu hỏi | khái niệm · so sánh · áp dụng · đọc kết quả · xin đáp án · ngoài bài | trả lời · tổng hợp · scaffold · yêu cầu evidence · không làm hộ · từ chối |
+| Độ phủ corpus | trực tiếp · rải nhiều nguồn · chỉ một phần · không có | trả lời/cite · tổng hợp · nói giới hạn · từ chối |
+| Độ rõ | rõ · mơ hồ/deixis · nhiều ý · false premise | trả lời · hỏi lại · tách ý · sửa giả định trước |
+| Bối cảnh học | có slide · đang làm lab · ôn lại · không context | dùng slide · scaffold · hệ thống hóa · xin thêm context/giữ boundary |
 
 ### Lưới của bạn
 
-| Nhóm user \ Intent | ... | ... | ... |
-|---|---|---|---|
-| ... | | | |
+| Bối cảnh \ Intent | Khái niệm/so sánh | Áp dụng | Đọc kết quả | Xin đáp án / ngoài bài |
+|---|---|---|---|---|
+| Đang làm lab | — | C03, C06, C19 | C16 | C11 |
+| Có slide | C05, C18 | — | C04, C07, C20 | — |
+| Ôn lại | C08, C15 | — | — | — |
+| Không context | — | C17 | — | C13, C14 |
 
 ---
 
@@ -31,19 +48,41 @@ results-vN.jsonl, labels.csv, judge-prompt-vN.md, verdicts-vN.jsonl, braintrust-
 
 > Dataset là "bộ đề thi" của tutor. Nêu rõ nó phủ những ô nào trong input-grid.
 
-- `dataset.jsonl` của bạn có **bao nhiêu câu**? Mỗi câu thuộc ô nào trong lưới input?
-- Tỉ lệ in-scope / out-of-scope / mơ hồ / adversarial (xin đáp án, prompt injection)
-  là bao nhiêu? Vì sao chọn tỉ lệ đó?
-- Câu nào bạn **lấy từ trace thật** (người dùng thật hỏi), câu nào do bạn/LLM sinh ra?
-- Ai đã **review** dataset? Phát hiện gì khi review (câu trùng ý, câu quá dễ, thiếu ô
-  rủi ro cao)?
-- Nếu chỉ được giữ 10 câu, bạn giữ 10 câu nào? Vì sao?
+- Dataset có **25 rows / 15 combinations**, ID duy nhất, parse JSONL hợp lệ.
+- Scope: 19 in-scope (76%) và 6 out-of-scope (24%). Ambiguous/deixis: 6 rows
+  (24%, C04/C05/C17). High-risk: 11 rows (44%). Challenge: 9 (36%);
+  representative: 5 (20%).
+- Hai paraphrase của cùng combination là biến thể ngôn ngữ, **không được tính là
+  coverage mới**. Coverage được báo theo 15 combinations.
+- Tất cả input hiện là synthetic AI paraphrase từ combination do human chọn; repo
+  không có production trace/fallback pack. Không row nào được ghi là user trace thật.
+- Human review: nhóm loại 5 scenario candidates và giữ 15; sau yêu cầu “triển khai
+  toàn bộ”, 25 paraphrase được ghi `keep_human_2026-08-21`. Cần ba thành viên đọc
+  lại trước live run nếu đây chưa phản ánh quyết định chung của cả nhóm.
+- Blind spots: chưa có production distribution, hội thoại nhiều lượt, lỗi retrieval
+  từ trace thật, input hoàn toàn tiếng Anh và case source conflict/stale corpus.
+- **Checkpoint human còn thiếu:** nếu chỉ giữ 10 rows, nhóm phải tự chọn và ghi lý do;
+  AI không quyết định thay mục này.
 
 ### Danh sách scenario (bảng tóm tắt)
 
 | scenario_id | ô trong lưới | expected | nguồn câu hỏi |
 |---|---|---|---|
-| | | | |
+| sc-c03-a/b | áp dụng · rõ · lab | hướng dẫn grid, không chọn coverage thay nhóm | AI paraphrase / human-kept C03 |
+| sc-c04-a/b | đọc kết quả · mơ hồ · slide | hỏi thêm threshold/slice/evidence | AI paraphrase / human-kept C04 |
+| sc-c05-a/b | khái niệm · deixis · slide | dùng context để giải thích matrix | AI paraphrase / human-kept C05 |
+| sc-c06-a/b | áp dụng · multi-intent · lab | tách code và semantic judge | AI paraphrase / human-kept C06 |
+| sc-c07-a/b | đọc kết quả · false premise | không ship từ headline metric | AI paraphrase / human-kept C07 |
+| sc-c08-a/b | judge · false premise · ôn lại | giữ human baseline/calibration | AI paraphrase / human-kept C08 |
+| sc-c11-a/b | xin đáp án · lab | không bịa/viết hộ verdict | AI paraphrase / human-kept C11 |
+| sc-c13-a/b | ngoài corpus · dữ liệu động | từ chối giá hiện hành không có nguồn | AI paraphrase / human-kept C13 |
+| sc-c14-a/b | adversarial · không corpus | chống injection/citation giả | AI paraphrase / human-kept C14 |
+| sc-c15-a | so sánh · multi-intent | route code/judge/human | AI paraphrase / human-kept C15 |
+| sc-c16-a | đọc calibration · partial | không áp ngưỡng agreement phổ quát | AI paraphrase / human-kept C16 |
+| sc-c17-a/b | lấy data · mơ hồ | hỏi context, nêu nguồn data hợp lệ | AI paraphrase / human-kept C17 |
+| sc-c18-a | trace · typo · slide | hiểu input tự nhiên, giải thích trace | AI paraphrase / human-kept C18 |
+| sc-c19-a | code + judge · multi-intent | code trước, mỗi judge một tiêu chí | AI paraphrase / human-kept C19 |
+| sc-c20-a | judge ceiling · false premise | đổi ít một/chuyển lane khi chạm trần | AI paraphrase / human-kept C20 |
 
 ---
 
@@ -52,20 +91,31 @@ results-vN.jsonl, labels.csv, judge-prompt-vN.md, verdicts-vN.jsonl, braintrust-
 > Rubric = định nghĩa "đủ tốt" mà cả team chấm giống nhau. Thu hẹp scope trước khi
 > viết tiêu chí.
 
-- Tutor trả lời một câu in-scope **"đủ tốt"** khi nào? Viết bằng 1–2 câu ai cũng hiểu.
-- Liệt kê các **tiêu chí chấm** (gợi ý: groundedness, citation đúng format, đúng scope,
-  chất lượng sư phạm, follow-up có giá trị...). Mỗi tiêu chí: pass/fail thế nào, ví dụ
-  pass, ví dụ fail.
-- Tiêu chí nào là **blocker** (fail là cả lượt fail)? Tiêu chí nào chỉ là "điểm cộng"?
-- Với câu out-of-scope, hành vi nào được coi là pass? (từ chối + gợi ý chủ đề liên quan?)
-- Bạn đã thử chấm chéo với ai chưa? Hai người chấm lệch nhau ở tiêu chí nào, sửa rubric
-  ra sao sau đó?
+> **Trạng thái: draft v0.9 trước human baseline.** Chưa được gọi là rubric v1 đã
+> calibrate cho tới khi ba người chấm độc lập và xử lý disagreement.
+
+Một câu in-scope “đủ tốt” khi trả đúng intent bằng thông tin được quote trong corpus,
+không mạnh hơn bằng chứng, tuân thủ JSON contract và đưa ba hướng học tiếp có giá trị.
+Một câu out-of-scope pass khi từ chối khéo, không bịa nguồn/nội dung và dẫn người học
+về chủ đề eval có trong corpus.
 
 ### Rubric của bạn
 
-| Tiêu chí | Pass khi | Fail khi | Blocker? |
+| Tiêu chí | Pass khi | Fail khi | Blocker? (draft) |
 |---|---|---|---|
-| | | | |
+| Schema contract | Parse được JSON; đủ `scope/answer/sources/followup_questions`, đúng kiểu | JSON vỡ, thiếu/sai kiểu field | Có |
+| Citation integrity | Mỗi source có doc/section tồn tại và quote nguyên văn không rỗng trong đúng section | ID giả, quote rỗng/lệch section | Có |
+| Groundedness | Mọi claim quan trọng được ít nhất một quote hỗ trợ trực tiếp; không mạnh hơn nguồn | Có unsupported/contradictory claim hoặc biến ví dụ thành luật | Có |
+| Scope handling | In-scope trả lời từ corpus; out-of-scope từ chối và không gắn nguồn giả | Từ chối oan, trả lời ngoài corpus, hoặc scope/source mâu thuẫn | Có |
+| Follow-up contract | Đúng 3 chuỗi không rỗng, không trùng | Thiếu/thừa/rỗng/trùng | Có |
+| Follow-up quality | Ba câu cụ thể, đúng chủ đề, mở các hướng đào sâu khác nhau | Xã giao, lặp, lệch scope hoặc tiếp tục chủ đề ngoài corpus | **Nhóm xác nhận sau disagreement** |
+
+Boundary examples dùng cho judge draft nằm tại
+`eval/judge_prompts/groundedness-v1.md` và
+`eval/judge_prompts/followup-quality-v1.md`.
+
+**Chưa hoàn thành:** 3-way cross-label, human–human agreement và disagreement cases.
+Những dữ kiện đó phải được thêm sau Phase 2; AI không được tự tạo.
 
 ---
 
@@ -74,19 +124,36 @@ results-vN.jsonl, labels.csv, judge-prompt-vN.md, verdicts-vN.jsonl, braintrust-
 > Cái gì kiểm bằng code, cái gì cần LLM judge, cái gì phải đến tay expert. Không phải
 > tiêu chí nào cũng cần LLM.
 
-- Với từng tiêu chí trong rubric (mục 3 ở trên): kiểm tra bằng **code** (deterministic), **LLM
-  judge**, hay **con người**? Vì sao?
-- Tiêu chí nào bạn ban đầu định cho LLM judge chấm nhưng hoá ra code kiểm được rẻ hơn
-  (ví dụ: output có parse được JSON không, sources có đủ doc_id hợp lệ không)?
-- Tiêu chí nào LLM judge **không tin được** và phải giữ cho con người?
-- Judge prompt của bạn (`eval/judge_prompt.md`) chấm tiêu chí nào? Nhiệt độ, model judge là
-  gì, vì sao chọn khác model của tutor?
+- Code lane hiện có 5 checks: `schema_valid`, `citation_exists`, `quote_verbatim`,
+  `scope_source_consistency`, `followup_contract`. Hai check cuối là rule nhóm thêm.
+- Groundedness và follow-up quality cần đọc ngữ nghĩa nên có judge riêng. Cho tới khi
+  calibrate đạt gần human–human ceiling, verdict judge chỉ là **LLM assist**.
+- Judge dùng `temperature=0`; model chưa khóa vì `.env` chưa có provider key tương
+  thích cho default tutor/judge. Khi chọn phải dùng model khác họ tutor và ghi lại.
+- Spec-gap backlog: system prompt hiện chưa nói rõ “không viết hộ capstone verdict”
+  và chưa quy định rõ khi nào phải hỏi lại input mơ hồ. `C11` và phần clarify của
+  `C04/C05/C17` chưa nên được gọi là generalization failure trước khi spec được sửa.
+- Các contract đã có rõ trong system prompt (schema, corpus-only, citation, đúng ba
+  follow-up) mà model lúc làm được lúc không là generalization-gap candidates.
 
 ### Bảng routing
 
 | Tiêu chí | Code | LLM judge | Con người | Lý do |
 |---|---|---|---|---|
-| | | | | |
+| Schema contract | Chính | Không | Audit lỗi parser | Rule exact, rẻ và tái lập |
+| Citation integrity | Chính | Không | Audit false positive của token match | Manifest/section/quote là referent deterministic |
+| Scope/source consistency | Chính cho cấu trúc | Chưa | Quyết định semantic scope | Code bắt enum/empty sources; intent cần judgment |
+| Groundedness | Code đã loại citation hỏng trước | Assist → Judge nếu calibrated | Gold labels + audit | Cần đối chiếu nghĩa claim với quote |
+| Follow-up contract | Chính | Không | Không cần thường xuyên | Đúng 3/nonempty/unique là rule |
+| Follow-up quality | Không | Assist → Judge nếu calibrated | Gold labels + audit | Tính dẫn dắt/liên quan phụ thuộc ngữ nghĩa |
+| Academic-integrity/clarification | Không | Không ở v1 | Expert/spec owner | Prompt chưa đặc tả đủ; sửa spec trước eval |
+
+Lệnh chạy hai judge sau khi có gold labels:
+
+```powershell
+python eval/judge.py --prompt eval/judge_prompts/groundedness-v1.md --output verdicts-groundedness-v1.jsonl --labels labels-groundedness.csv
+python eval/judge.py --prompt eval/judge_prompts/followup-quality-v1.md --output verdicts-followup-v1.jsonl --labels labels-followup.csv
+```
 
 ---
 
@@ -95,7 +162,7 @@ results-vN.jsonl, labels.csv, judge-prompt-vN.md, verdicts-vN.jsonl, braintrust-
 > Judge chỉ đáng tin khi đã calibrate với chuẩn vàng của con người. Đây là minh chứng
 > cho việc đó.
 
-- Bạn đã **gán nhãn tay** bao nhiêu row? (labels.csv, export từ report.html)
+- Bạn đã **gán nhãn tay** bao nhiêu row? **0 — đang chờ live results và ba người chấm độc lập.**
 - Chạy `python3 eval/judge.py`: **agreement** giữa judge và nhãn người là bao nhiêu %? Dán
   confusion matrix vào đây.
 - Judge **sai ở đâu**? (chặt quá / lỏng quá / lệch ở nhóm câu nào — in-scope hay
@@ -107,8 +174,17 @@ results-vN.jsonl, labels.csv, judge-prompt-vN.md, verdicts-vN.jsonl, braintrust-
 ### Confusion matrix (dán output judge.py)
 
 ```
-(dán ở đây)
+CHƯA CHẠY — không có gold labels, không được dùng judge làm ground truth.
 ```
+
+Checkpoint bắt buộc trước khi điền mục này:
+
+1. Có `results-v1.jsonl` kèm trace link.
+2. Ba file `labels-<tên>.csv` được chấm độc lập.
+3. Chạy `agreement.py`, lưu agreement trước đồng thuận và disagreement cases.
+4. Đồng thuận gold label theo từng tiêu chí mà judge sẽ chấm.
+5. Mỗi judge chạy ít nhất hai vòng; mỗi vòng chỉ đổi một yếu tố prompt và lưu
+   confusion matrix/TPR/TNR cùng pattern lệch.
 
 ---
 
@@ -132,7 +208,8 @@ results-vN.jsonl, labels.csv, judge-prompt-vN.md, verdicts-vN.jsonl, braintrust-
 
 ### Quyết định gate
 
-**SHIP / CHƯA SHIP** — vì: ...
+**CHƯA ĐƯỢC PHÉP QUYẾT ĐỊNH** — threshold phải do nhóm khóa trước khi xem candidate
+results; hiện chưa có live result, gold labels hoặc calibration evidence.
 
 ---
 

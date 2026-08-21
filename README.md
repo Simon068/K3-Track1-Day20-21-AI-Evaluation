@@ -19,7 +19,7 @@ README này là hướng dẫn duy nhất: bước nào gõ lệnh gì, file nà
 | `tutor/` | **Sản phẩm đang được đánh giá** — tutor thật (`tutor.py`: system prompt + tool-calling `kb_search`, BM25 retrieval) và `corpus/` 18 tài liệu nguồn + `manifest.json` (địa chỉ nguồn: `doc_id#section_id`) |
 | `eval/` | **Bộ máy chấm** — code chạy & phân tích eval + tracking: `run_eval.py`, `code_checks.py`, `judge.py`, `agreement.py`, `report.py`, `tracing.py`, kèm `judge_prompt.md` (prompt judge — **file bạn sẽ sửa nhiều nhất khi calibrate**) |
 | `deliverables/` | **Khung bài nộp** — report log A→Z, lock input/output/quyết định từng bước: `REPORT.md` một file gồm 7 mục quyết định theo phase (1 Input Grid … 7 Verdict) + `evidence/` chứa data thô dẫn chứng (xem README trong đó) |
-| `tests/` | `test_eval_kit.py` — 44 test offline (không tốn API), chạy trước khi làm bất cứ thứ gì |
+| `tests/` | `test_eval_kit.py` — 48 test offline (không tốn API), chạy trước khi làm bất cứ thứ gì |
 | `data/` | File mẫu: `dataset.example.jsonl` (5 câu đủ loại: in-scope, out-of-scope, mơ hồ, xin đáp án) và `labels.example.csv` (format nhãn người) |
 | root | File làm việc (scratch) bạn sinh ra khi chạy: `dataset.jsonl`, `results.jsonl`, `verdicts.jsonl`, `labels.csv`, `report.html` (đã gitignore, không commit) |
 
@@ -33,7 +33,7 @@ theo version (`results-v1.jsonl`, `verdicts-v2.jsonl`...), không ghi đè vòng
 pip install -r requirements.txt        # 1. cài đặt (chỉ cần requests; braintrust/langsmith để tracing)
 cp .env.example .env                   # 2. điền API key của provider bạn dùng (+ BRAINTRUST_API_KEY hoặc LANGSMITH_API_KEY để log trace)
 cp data/dataset.example.jsonl dataset.jsonl
-python3 tests/test_eval_kit.py         # 3. 44 test offline phải sạch hết
+python3 tests/test_eval_kit.py         # 3. 48 test offline phải sạch hết
 python3 eval/run_eval.py                # 4. chạy tutor trên dataset -> results.jsonl
 python3 eval/report.py && open report.html   # 5. xem kết quả, gán nhãn
 ```

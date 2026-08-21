@@ -1,13 +1,15 @@
 """Chấm results.jsonl bằng LLM judge -> verdicts.jsonl, rồi đối chiếu labels.csv.
 
 Cách dùng (chạy từ root repo):
-  python3 eval/judge.py                # chấm tất cả các row
+  python3 eval/judge.py                # prompt/output mặc định
   python3 eval/judge.py sc-01 sc-03    # chỉ chấm các scenario_id được chọn
+  python3 eval/judge.py --prompt eval/judge_prompts/groundedness-v1.md \
+      --output verdicts-groundedness-v1.jsonl --labels labels-groundedness.csv
 Judge dùng prompt trong eval/judge_prompt.md (placeholder {{input}} {{answer}} {{sources}}).
 Model judge mặc định khác model tutor (EVAL_JUDGE_MODEL, mặc định openai/gpt-4o-mini)
 để tránh tự chấm chéo cùng một model.
 """
-import csv, json, os, sys
+import argparse, csv, json, os, sys
 from pathlib import Path
 
 # tutor.py nằm ở tutor/ (khu vực sản phẩm) — thêm vào sys.path để import được
@@ -52,13 +54,14 @@ def build_judge_prompt(rec, template):
                     .replace("{{answer}}", answer)
                     .replace("{{sources}}", sources))
 
-def judge_row(rec, template):
+def judge_row(rec, template, criterion="unspecified"):
     prompt = build_judge_prompt(rec, template)
     data, latency = tutor.chat([{"role": "user", "content": prompt}],
                                model=JUDGE_MODEL, max_tokens=500)
     content = data["choices"][0]["message"]["content"]
     out = tutor.parse_json_content(content)
-    return {"scenario_id": rec["scenario_id"], "verdict": out.get("verdict", "uncertain"),
+    return {"scenario_id": rec["scenario_id"], "criterion": criterion,
+            "verdict": out.get("verdict", "uncertain"),
             "score": out.get("score"), "rationale": out.get("rationale", ""),
             "issues": out.get("issues", []), "raw_content": content,
             "usage": data.get("usage", {}), "latency_s": round(latency, 2)}
@@ -80,26 +83,42 @@ def print_confusion(verdicts, labels):
     agree = sum(1 for v, h in pairs if v == h)
     print("Agreement: %d/%d = %.0f%%" % (agree, len(pairs), 100.0 * agree / len(pairs)))
 
-def main():
+def parse_args(argv=None):
+    parser = argparse.ArgumentParser(description="Chạy một LLM judge cho đúng một tiêu chí.")
+    parser.add_argument("scenario_ids", nargs="*", help="Để trống = chấm mọi row")
+    parser.add_argument("--prompt", default=PROMPT_PATH, help="File prompt của tiêu chí")
+    parser.add_argument("--output", default="verdicts.jsonl", help="File JSONL kết quả")
+    parser.add_argument("--labels", default="labels.csv", help="Gold labels cùng tiêu chí")
+    parser.add_argument("--criterion", help="Tên tiêu chí; mặc định lấy từ tên prompt")
+    return parser.parse_args(argv)
+
+
+def main(argv=None):
+    args = parse_args(argv)
     results = read_jsonl("results.jsonl")
     if not results:
         sys.exit("Không thấy results.jsonl — chạy python3 eval/run_eval.py trước.")
     if not tutor.get_api_key(JUDGE_MODEL):
         sys.exit("Chưa có API key cho judge model %s — xem .env.example." % JUDGE_MODEL)
-    chosen = set(sys.argv[1:])
+    if not os.path.exists(args.prompt):
+        sys.exit("Không thấy judge prompt: %s" % args.prompt)
+    chosen = set(args.scenario_ids)
     rows = [r for r in results if not chosen or r["scenario_id"] in chosen]
     rows = [r for r in rows if "output" in r]  # bỏ row lỗi, không có gì để chấm
-    template = open(PROMPT_PATH, encoding="utf-8").read()
-    print("Chấm %d row bằng judge %s ..." % (len(rows), JUDGE_MODEL))
+    template = open(args.prompt, encoding="utf-8").read()
+    criterion = args.criterion or Path(args.prompt).stem
+    print("Chấm %d row, tiêu chí %s, judge %s ..." %
+          (len(rows), criterion, JUDGE_MODEL))
 
     verdicts = []
     for i, rec in enumerate(rows, 1):
         print("[%d/%d] %s ... " % (i, len(rows), rec["scenario_id"]), end="", flush=True)
         try:
-            v = judge_row(rec, template)
+            v = judge_row(rec, template, criterion)
             _tracer.log_run(
                 name="judge-run",
-                inputs={"scenario_id": rec["scenario_id"], "judge_model": JUDGE_MODEL},
+                inputs={"scenario_id": rec["scenario_id"], "judge_model": JUDGE_MODEL,
+                        "criterion": criterion, "prompt_file": args.prompt},
                 outputs={"verdict": v["verdict"], "rationale": v.get("rationale", "")},
                 metrics={**{k: x for k, x in v.get("usage", {}).items()
                             if isinstance(x, (int, float))},
@@ -112,14 +131,14 @@ def main():
             print("LỖI: %s" % e)
         verdicts.append(v)
 
-    with open("verdicts.jsonl", "w", encoding="utf-8") as f:
+    with open(args.output, "w", encoding="utf-8") as f:
         for v in verdicts:
             f.write(json.dumps(v, ensure_ascii=False) + "\n")
-    print("Ghi %d verdict vào verdicts.jsonl" % len(verdicts))
+    print("Ghi %d verdict vào %s" % (len(verdicts), args.output))
     if _tracer.backend:
         _tracer.flush()
         print("Đã log %d trace judge lên %s." % (len(verdicts), _tracer.backend))
-    print_confusion(verdicts, read_labels())
+    print_confusion(verdicts, read_labels(args.labels))
 
 if __name__ == "__main__":
     main()

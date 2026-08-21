@@ -65,10 +65,56 @@ def check_quote_verbatim(rec, section_tokens):
     return True, None
 
 
+def check_scope_source_consistency(rec):
+    """Scope và sources phải nhất quán với contract của tutor.
+
+    In-scope cần ít nhất một nguồn; out-of-scope không được gắn nguồn để hợp thức
+    hoá một câu trả lời ngoài corpus.
+    """
+    out = rec.get("output") or {}
+    if out.get("_parse_error"):
+        return None, "bỏ qua (JSON vỡ)"
+    scope = out.get("scope")
+    sources = out.get("sources")
+    if scope not in {"in_scope", "out_of_scope"}:
+        return False, f"scope không hợp lệ: {scope!r}"
+    if not isinstance(sources, list):
+        return False, "sources phải là list"
+    if scope == "in_scope" and not sources:
+        return False, "in_scope nhưng sources rỗng"
+    if scope == "out_of_scope" and sources:
+        return False, "out_of_scope nhưng vẫn gắn sources"
+    return True, None
+
+
+def check_followup_contract(rec):
+    """Có đúng 3 follow-up không rỗng và không trùng nhau.
+
+    Check này chỉ chấm hình thức. Việc câu hỏi có dẫn dắt, đúng scope và hữu ích
+    hay không vẫn thuộc làn semantic judge/human.
+    """
+    out = rec.get("output") or {}
+    if out.get("_parse_error"):
+        return None, "bỏ qua (JSON vỡ)"
+    followups = out.get("followup_questions")
+    if not isinstance(followups, list):
+        return False, "followup_questions phải là list"
+    if len(followups) != 3:
+        return False, f"cần đúng 3 follow-up, hiện có {len(followups)}"
+    if not all(isinstance(q, str) and q.strip() for q in followups):
+        return False, "follow-up phải là chuỗi không rỗng"
+    normalized = {" ".join(q.lower().split()).rstrip("?.!") for q in followups}
+    if len(normalized) != 3:
+        return False, "follow-up bị trùng nội dung"
+    return True, None
+
+
 CHECKS = [  # thêm check của nhóm vào đây
     ("schema_valid", check_schema),
     ("citation_exists", check_citation_exists),
     ("quote_verbatim", check_quote_verbatim),
+    ("scope_source_consistency", check_scope_source_consistency),
+    ("followup_contract", check_followup_contract),
 ]
 
 
@@ -86,12 +132,12 @@ def main(path="results.jsonl"):
         sid = rec.get("scenario_id", "?")
         line = [sid]
         for name, fn in CHECKS:
-            if fn is check_schema:
-                ok, reason = fn(rec)
-            elif fn is check_citation_exists:
+            if fn is check_citation_exists:
                 ok, reason = fn(rec, valid_ids)
-            else:
+            elif fn is check_quote_verbatim:
                 ok, reason = fn(rec, section_tokens)
+            else:
+                ok, reason = fn(rec)
             if ok is None:
                 line.append(f"{name}: skip")
                 continue

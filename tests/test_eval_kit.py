@@ -184,6 +184,20 @@ check("cost deepseek", estimate_cost_usd("deepseek/deepseek-v4-flash",
       {"prompt_tokens": 1_000_000, "completion_tokens": 1_000_000}) == 1.76)
 check("cost model lạ -> None", estimate_cost_usd("x/y", {"prompt_tokens": 1}) is None)
 
+import code_checks
+contract_ok = {"output": {"scope": "in_scope", "sources": [{"doc_id": "d"}],
+                            "followup_questions": ["a?", "b?", "c?"]}}
+ok, _ = code_checks.check_scope_source_consistency(contract_ok)
+check("custom check: in_scope có source", ok is True)
+bad_scope = {"output": {"scope": "out_of_scope", "sources": [{"doc_id": "d"}]}}
+ok, _ = code_checks.check_scope_source_consistency(bad_scope)
+check("custom check: out_of_scope không được cite", ok is False)
+ok, _ = code_checks.check_followup_contract(contract_ok)
+check("custom check: đúng 3 follow-up unique", ok is True)
+dup_followup = {"output": {"followup_questions": ["Câu này?", "câu này", "Khác?"]}}
+ok, _ = code_checks.check_followup_contract(dup_followup)
+check("custom check: bắt follow-up trùng", ok is False)
+
 print("== Tầng 7b: tracing backend ==")
 import importlib.util
 import tracing
