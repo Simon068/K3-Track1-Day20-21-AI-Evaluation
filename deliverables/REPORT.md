@@ -4,6 +4,13 @@ Report A→Z của eval loop — mỗi mục ứng một phase của bài lab. M
 định trong đây phải dẫn được xuống file data thô trong `evidence/` (dataset-v1.jsonl,
 results-vN.jsonl, labels.csv, judge-prompt-vN.md, verdicts-vN.jsonl, braintrust-link.md).
 
+### Thành viên nhóm
+
+| Họ và tên | Mã sinh viên |
+|---|---|
+| Trần Kiên | `2A202601598` |
+| Nguyễn Phú Quang | `2A202602017` |
+
 
 ---
 
@@ -57,7 +64,7 @@ results-vN.jsonl, labels.csv, judge-prompt-vN.md, verdicts-vN.jsonl, braintrust-
 - Tất cả input hiện là synthetic AI paraphrase từ combination do human chọn; repo
   không có production trace/fallback pack. Không row nào được ghi là user trace thật.
 - Human review: nhóm loại 5 scenario candidates và giữ 15; sau yêu cầu “triển khai
-  toàn bộ”, 25 paraphrase được ghi `keep_human_2026-08-21`. Cần ba thành viên đọc
+  toàn bộ”, 25 paraphrase được ghi `keep_human_2026-08-21`. Cần hai thành viên đọc
   lại trước live run nếu đây chưa phản ánh quyết định chung của cả nhóm.
 - Blind spots: chưa có production distribution, hội thoại nhiều lượt, lỗi retrieval
   từ trace thật, input hoàn toàn tiếng Anh và case source conflict/stale corpus.
@@ -92,7 +99,7 @@ results-vN.jsonl, labels.csv, judge-prompt-vN.md, verdicts-vN.jsonl, braintrust-
 > viết tiêu chí.
 
 > **Trạng thái: draft v0.9 trước human baseline.** Chưa được gọi là rubric v1 đã
-> calibrate cho tới khi ba người chấm độc lập và xử lý disagreement.
+> calibrate cho tới khi hai người chấm độc lập và xử lý disagreement.
 
 Một câu in-scope “đủ tốt” khi trả đúng intent bằng thông tin được quote trong corpus,
 không mạnh hơn bằng chứng, tuân thủ JSON contract và đưa ba hướng học tiếp có giá trị.
@@ -114,7 +121,7 @@ Boundary examples dùng cho judge draft nằm tại
 `eval/judge_prompts/groundedness-v1.md` và
 `eval/judge_prompts/followup-quality-v1.md`.
 
-**Chưa hoàn thành:** 3-way cross-label, human–human agreement và disagreement cases.
+**Chưa hoàn thành:** 2-way independent cross-label, human–human agreement và disagreement cases.
 Những dữ kiện đó phải được thêm sau Phase 2; AI không được tự tạo.
 
 ---
@@ -162,7 +169,7 @@ python eval/judge.py --prompt eval/judge_prompts/followup-quality-v1.md --output
 > Judge chỉ đáng tin khi đã calibrate với chuẩn vàng của con người. Đây là minh chứng
 > cho việc đó.
 
-- Bạn đã **gán nhãn tay** bao nhiêu row? **0 — đang chờ live results và ba người chấm độc lập.**
+- Bạn đã **gán nhãn tay** bao nhiêu row? **0 — đang chờ hai người chấm độc lập.**
 - Chạy `python3 eval/judge.py`: **agreement** giữa judge và nhãn người là bao nhiêu %? Dán
   confusion matrix vào đây.
 - Judge **sai ở đâu**? (chặt quá / lỏng quá / lệch ở nhóm câu nào — in-scope hay
@@ -180,7 +187,7 @@ CHƯA CHẠY — không có gold labels, không được dùng judge làm ground
 Checkpoint bắt buộc trước khi điền mục này:
 
 1. Có `results-v1.jsonl` kèm trace link.
-2. Ba file `labels-<tên>.csv` được chấm độc lập.
+2. Hai file `labels-tran-kien.csv` và `labels-nguyen-phu-quang.csv` được chấm độc lập.
 3. Chạy `agreement.py`, lưu agreement trước đồng thuận và disagreement cases.
 4. Đồng thuận gold label theo từng tiêu chí mà judge sẽ chấm.
 5. Mỗi judge chạy ít nhất hai vòng; mỗi vòng chỉ đổi một yếu tố prompt và lưu

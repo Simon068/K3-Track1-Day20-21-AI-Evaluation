@@ -4,6 +4,13 @@
 > Trung thực là một phần của bài nộp — không ai làm một mình, quan trọng là bạn giữ
 > quyền kiểm soát chất lượng.
 
+## Thành viên nhóm
+
+| Họ và tên | Mã sinh viên |
+|---|---|
+| Trần Kiên | `2A202601598` |
+| Nguyễn Phú Quang | `2A202602017` |
+
 | # | Bước | AI dùng để làm gì | Bạn kiểm chứng kết quả thế nào |
 |---|------|-------------------|-------------------------------|
 | 1 | Phase 1 — evidence map | Đọc corpus/slide, trích section và lập 20 scenario candidates | Human reject C01/C02/C09/C10/C12, keep 15 scenario ngày 2026-08-21 |

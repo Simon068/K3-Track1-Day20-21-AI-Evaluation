@@ -4,6 +4,13 @@ Tài liệu này dành cho thành viên thứ hai. Mục tiêu của bạn là *
 của tutor và gửi lại một file CSV**. Bạn không cần API key, không cần chạy tutor và
 không được xem nhãn của thành viên còn lại trước khi export.
 
+## Thành viên nhóm
+
+| Họ và tên | Mã sinh viên | Vai trò ở bước human baseline | File nhãn |
+|---|---|---|---|
+| Trần Kiên | `2A202601598` | Chủ repo, chấm độc lập và tổng hợp agreement | `labels-tran-kien.csv` |
+| Nguyễn Phú Quang | `2A202602017` | Thành viên thứ hai, chấm độc lập | `labels-nguyen-phu-quang.csv` |
+
 ## 0. Branch và repository đang dùng
 
 | Vai trò | Repository / branch |
@@ -11,7 +18,7 @@ không được xem nhãn của thành viên còn lại trước khi export.
 | Repo gốc của lớp | `VinUni-AI20k/K3-Track1-Day20-21-AI-Evaluation` · `master` |
 | Fork của nhóm | `Simon068/K3-Track1-Day20-21-AI-Evaluation` |
 | Branch chứa bài đang làm | `codex/eval-capstone` |
-| Branch nhãn tùy chọn | `codex/human-labels-<tên>` |
+| Branch nhãn của Nguyễn Phú Quang (tùy chọn) | `codex/human-labels-nguyen-phu-quang` |
 
 Link branch chính của nhóm:
 
@@ -112,10 +119,10 @@ Không dùng note chung chung như `cảm giác chưa ổn`.
 ## 4. Export labels
 
 1. Chấm xong, bấm **Export labels.csv** ở đầu trang.
-2. Đổi tên file thành `labels-<tên>.csv`, ví dụ:
+2. Đổi tên file thành:
 
 ```text
-labels-binh.csv
+labels-nguyen-phu-quang.csv
 ```
 
 3. Mở nhanh file và xác nhận có ba cột:
@@ -140,12 +147,12 @@ Root repo ignore `labels-*.csv`, nên phải đặt file trong `deliverables/evi
 
 ```powershell
 Copy-Item "$env:USERPROFILE\Downloads\labels.csv" `
-  ".\deliverables\evidence\labels-<tên>.csv"
+  ".\deliverables\evidence\labels-nguyen-phu-quang.csv"
 
-git switch -c codex/human-labels-<tên>
-git add -- deliverables/evidence/labels-<tên>.csv
-git commit -m "Add independent human labels from <tên>"
-git push -u origin codex/human-labels-<tên>
+git switch -c codex/human-labels-nguyen-phu-quang
+git add -- deliverables/evidence/labels-nguyen-phu-quang.csv
+git commit -m "Add independent human labels from Nguyen Phu Quang 2A202602017"
+git push -u origin codex/human-labels-nguyen-phu-quang
 ```
 
 Gửi lại tên branch cho chủ nhóm. Không sửa `REPORT.md`, rubric hoặc labels của người
@@ -164,14 +171,14 @@ khác trên branch này.
 Đặt hai file cạnh `README.md`, ví dụ:
 
 ```text
-labels-an.csv
-labels-binh.csv
+labels-tran-kien.csv
+labels-nguyen-phu-quang.csv
 ```
 
 Chạy agreement:
 
 ```powershell
-python eval/agreement.py labels-an.csv labels-binh.csv
+python eval/agreement.py labels-tran-kien.csv labels-nguyen-phu-quang.csv
 ```
 
 Expected output:
@@ -188,5 +195,5 @@ labels. Không dùng AI làm người tie-break.
 - [ ] Đang xem đúng branch `codex/eval-capstone`.
 - [ ] Chấm độc lập cùng tập scenario IDs với thành viên còn lại.
 - [ ] Mọi `fail/uncertain` có note nêu tiêu chí và lý do.
-- [ ] Export thành `labels-<tên>.csv` đúng ba cột.
+- [ ] Export thành `labels-nguyen-phu-quang.csv` đúng ba cột.
 - [ ] Gửi CSV cho chủ nhóm mà chưa xem labels của người kia.

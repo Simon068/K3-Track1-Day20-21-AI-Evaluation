@@ -1,6 +1,11 @@
 # Human checkpoints còn thiếu
 
-Không điền giả các mục dưới đây. Đây là phần ba thành viên phải tự thực hiện.
+Không điền giả các mục dưới đây. Đây là phần hai thành viên phải tự thực hiện:
+
+| Họ và tên | Mã sinh viên | File nhãn độc lập |
+|---|---|---|
+| Trần Kiên | `2A202601598` | `labels-tran-kien.csv` |
+| Nguyễn Phú Quang | `2A202602017` | `labels-nguyen-phu-quang.csv` |
 
 ## A. Trước live run
 
@@ -20,9 +25,9 @@ Copy-Item results.jsonl deliverables/evidence/results-v1.jsonl
 python eval/report.py
 ```
 
-- [ ] Ba người chấm độc lập 15–20 row, không xem nhãn nhau.
-- [ ] Lưu `labels-<tên>.csv` của từng người.
-- [ ] Chạy `python eval/agreement.py labels-a.csv labels-b.csv labels-c.csv`.
+- [ ] Hai người chấm độc lập cùng 15–20 row, không xem nhãn nhau.
+- [ ] Lưu `labels-tran-kien.csv` và `labels-nguyen-phu-quang.csv`.
+- [ ] Chạy `python eval/agreement.py labels-tran-kien.csv labels-nguyen-phu-quang.csv`.
 - [ ] Ghi agreement trước đồng thuận và từng disagreement case.
 - [ ] Đồng thuận `labels.csv`; không để AI gắn nhãn.
 - [ ] Nếu calibrate judge theo từng tiêu chí, tạo gold files tương ứng

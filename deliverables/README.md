@@ -2,6 +2,13 @@
 
 "Chiếc hộp" chứa toàn bộ minh chứng eval loop của nhóm cho VLearn AI Tutor.
 
+## Thành viên nhóm
+
+| Họ và tên | Mã sinh viên |
+|---|---|
+| Trần Kiên | `2A202601598` |
+| Nguyễn Phú Quang | `2A202602017` |
+
 **Nguyên tắc bắt buộc:** mỗi bước của eval loop phải nộp đủ ba thứ —
 **đầu vào** (bạn cho gì vào), **đầu ra** (hệ thống trả gì ra — file data thô),
 và **quyết định** (bạn kết luận/lựa chọn gì ở bước đó, VÌ SAO). Thiếu một trong ba,
@@ -17,7 +24,7 @@ Track1_Day21_MHV_HoVaTen/
 │   └── evidence/                  # DATA THÔ — input/output thật của từng bước chạy
 │       ├── dataset-v1.jsonl       # dataset nhóm chốt (đầu vào mọi lần chạy)
 │       ├── results-v1.jsonl       # output tutor (mỗi row: input, output JSON, tool_calls, tokens, cost)
-│       ├── labels.csv             # nhãn người của 3 thành viên (vòng chấm độc lập)
+│       ├── labels.csv             # nhãn vàng sau khi 2 thành viên đồng thuận
 │       ├── judge-prompt-v1.md     # judge prompt vòng 1
 │       ├── judge-prompt-v2.md     # judge prompt vòng 2 (diff với v1 phải giải thích trong mục 5 của REPORT.md)
 │       ├── verdicts-v1.jsonl      # output judge vòng 1
