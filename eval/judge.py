@@ -32,12 +32,20 @@ JUDGE_REASONING_EFFORT = os.environ.get(
 
 # judge_prompt.md nằm cạnh file này trong eval/ — resolve theo __file__, không theo cwd
 PROMPT_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "judge_prompt.md")
-FATAL_PROVIDER_STATUSES = {401, 402, 403}
+FATAL_PROVIDER_STATUSES = {401, 402, 403, 429}
 
 
 def provider_http_status(error):
     """Lấy HTTP status từ lỗi requests mà không phụ thuộc trực tiếp vào requests."""
     return getattr(getattr(error, "response", None), "status_code", None)
+
+
+def parse_judge_output(content):
+    """Judge bắt buộc trả JSON; output bị cắt không phải verdict uncertain."""
+    out = tutor.parse_json_content(content)
+    if out.get("_parse_error"):
+        raise RuntimeError("judge trả output không parse được JSON hoặc bị cắt giữa chừng")
+    return out
 
 def read_jsonl(path):
     if not os.path.exists(path):
@@ -86,7 +94,7 @@ def judge_row(rec, template, criterion="unspecified"):
             "Tăng EVAL_JUDGE_MAX_TOKENS hoặc dùng model judge không tiêu tốn "
             "toàn bộ budget cho reasoning."
         )
-    out = tutor.parse_json_content(content)
+    out = parse_judge_output(content)
     return {"scenario_id": rec["scenario_id"], "criterion": criterion,
             "verdict": out.get("verdict", "uncertain"),
             "score": out.get("score"), "rationale": out.get("rationale", ""),
@@ -160,7 +168,9 @@ def main(argv=None):
         except Exception as e:
             status = provider_http_status(e)
             if status in FATAL_PROVIDER_STATUSES:
-                print("LỖI FATAL HTTP %s: provider từ chối xác thực/thanh toán." % status)
+                reason = ("provider rate-limit/quota" if status == 429
+                          else "provider từ chối xác thực/thanh toán")
+                print("LỖI FATAL HTTP %s: %s." % (status, reason))
                 if _tracer.backend:
                     _tracer.flush()
                 sys.exit(
