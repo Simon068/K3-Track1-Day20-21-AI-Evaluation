@@ -80,6 +80,7 @@ PROVIDERS = {
     "deepseek":   ("DEEPSEEK_API_KEY", "https://api.deepseek.com/v1"),
     "anthropic":  ("ANTHROPIC_API_KEY", "https://api.anthropic.com/v1"),
     "gemini":     ("GEMINI_API_KEY", "https://generativelanguage.googleapis.com/v1beta/openai"),
+    "groq":       ("GROQ_API_KEY", "https://api.groq.com/openai/v1"),
     "openrouter": ("OPENROUTER_API_KEY", "https://openrouter.ai/api/v1"),
 }
 

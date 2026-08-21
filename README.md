@@ -125,6 +125,7 @@ Model viết dạng `provider/model` — repo gọi **thẳng API chuẩn của 
 | `deepseek/deepseek-v4-flash`, ... | `DEEPSEEK_API_KEY` |
 | `gemini/gemini-3.1-flash-lite`, ... | `GEMINI_API_KEY` |
 | `anthropic/claude-...` | `ANTHROPIC_API_KEY` |
+| `groq/llama-3.3-70b-versatile`, `groq/openai/gpt-oss-20b` | `GROQ_API_KEY` |
 | `openrouter/<vendor>/<model>` | `OPENROUTER_API_KEY` |
 
 | Biến | Mặc định | Ý nghĩa |

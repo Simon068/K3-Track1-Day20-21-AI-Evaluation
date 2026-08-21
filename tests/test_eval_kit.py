@@ -91,6 +91,10 @@ b, k, m = tutor.resolve_provider("openai/gpt-4o-mini")
 check("openai direct", b == "https://api.openai.com/v1" and m == "gpt-4o-mini")
 b, k, m = tutor.resolve_provider("gemini/gemini-3.1-flash-lite")
 check("gemini direct", "generativelanguage.googleapis.com" in b and m == "gemini-3.1-flash-lite")
+os.environ["GROQ_API_KEY"] = "test-key-groq"
+b, k, m = tutor.resolve_provider("groq/llama-3.3-70b-versatile")
+check("groq direct", b == "https://api.groq.com/openai/v1" and
+      k == "test-key-groq" and m == "llama-3.3-70b-versatile")
 b, k, m = tutor.resolve_provider("openrouter/anthropic/claude-x")
 check("openrouter giữ nguyên id 2 đoạn", m == "anthropic/claude-x" and "openrouter.ai" in b)
 tutor.BASE_URL = "https://gw.example/v1"
