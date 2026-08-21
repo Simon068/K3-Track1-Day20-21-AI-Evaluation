@@ -180,6 +180,16 @@ rec2 = {"scenario_id": "q2", "input": "câu hỏi 2", "output": {"answer": "a", 
 p2 = judge_mod.build_judge_prompt(rec2, "{{input}}")
 check("judge prompt không slide thì sạch", "Ngữ cảnh" not in p2)
 
+class FakeHttpError(Exception):
+    pass
+
+fatal_error = FakeHttpError("payment required")
+fatal_error.response = type("Response", (), {"status_code": 402})()
+check("judge nhận diện HTTP 402 là lỗi hạ tầng fatal",
+      judge_mod.provider_http_status(fatal_error) in judge_mod.FATAL_PROVIDER_STATUSES)
+check("judge không coi lỗi row thường là fatal",
+      judge_mod.provider_http_status(RuntimeError("bad output")) is None)
+
 from run_eval import estimate_cost_usd
 check("cost deepseek", estimate_cost_usd("deepseek/deepseek-v4-flash",
       {"prompt_tokens": 1_000_000, "completion_tokens": 1_000_000}) == 1.76)
