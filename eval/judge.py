@@ -9,7 +9,7 @@ Judge dùng prompt trong eval/judge_prompt.md (placeholder {{input}} {{answer}} 
 Model judge mặc định khác model tutor (EVAL_JUDGE_MODEL, mặc định openai/gpt-4o-mini)
 để tránh tự chấm chéo cùng một model.
 """
-import argparse, csv, json, os, sys
+import argparse, csv, json, os, sys, time
 from pathlib import Path
 
 # tutor.py nằm ở tutor/ (khu vực sản phẩm) — thêm vào sys.path để import được
@@ -23,6 +23,7 @@ _tracer = tracing.init_tracer()
 
 JUDGE_MODEL = os.environ.get("EVAL_JUDGE_MODEL", "openai/gpt-4o-mini")
 JUDGE_MAX_TOKENS = int(os.environ.get("EVAL_JUDGE_MAX_TOKENS", "2000"))
+JUDGE_DELAY_S = float(os.environ.get("EVAL_JUDGE_DELAY_S", "0"))
 _default_reasoning_effort = (
     "minimal" if JUDGE_MODEL.startswith("openrouter/openai/gpt-5") else None
 )
@@ -181,6 +182,8 @@ def main(argv=None):
                  "error": str(e)}
             print("LỖI: %s" % e)
         verdicts.append(v)
+        if JUDGE_DELAY_S > 0 and i < len(rows):
+            time.sleep(JUDGE_DELAY_S)
 
     with open(args.output, "w", encoding="utf-8") as f:
         for v in verdicts:

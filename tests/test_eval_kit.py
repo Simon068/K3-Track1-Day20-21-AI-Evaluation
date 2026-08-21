@@ -102,6 +102,12 @@ reasoning_payload = {}
 tutor.apply_reasoning_config(reasoning_payload, "openrouter/openai/gpt-5-mini", "minimal")
 check("openrouter reasoning dùng object effort",
       reasoning_payload == {"reasoning": {"effort": "minimal"}})
+fake_retry_response = type("Response", (), {"headers": {"retry-after": "12.5"}})()
+check("provider retry tôn trọng Retry-After",
+      tutor.retry_delay_seconds(fake_retry_response, 0) == 12.5)
+fake_retry_response = type("Response", (), {"headers": {}})()
+check("provider retry có exponential fallback",
+      tutor.retry_delay_seconds(fake_retry_response, 2) == 4.0)
 b, k, m = tutor.resolve_provider("openrouter/anthropic/claude-x")
 check("openrouter giữ nguyên id 2 đoạn", m == "anthropic/claude-x" and "openrouter.ai" in b)
 tutor.BASE_URL = "https://gw.example/v1"

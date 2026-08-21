@@ -206,6 +206,16 @@ def apply_reasoning_config(payload, model, reasoning_effort):
         payload["reasoning"] = {"effort": reasoning_effort}
 
 
+def retry_delay_seconds(response, attempt):
+    """Delay cho lỗi tạm thời; ưu tiên Retry-After chính thức của provider."""
+    raw = response.headers.get("retry-after") if response is not None else None
+    try:
+        delay = float(raw)
+    except (TypeError, ValueError):
+        delay = 2 ** attempt
+    return min(60.0, max(1.0, delay))
+
+
 def chat(messages, model=None, temperature=0, max_tokens=800, tools=None,
          reasoning_effort=None):
     model = model or MODEL
@@ -237,6 +247,11 @@ def chat(messages, model=None, temperature=0, max_tokens=800, tools=None,
     for attempt in range(3):  # gateway/provider thỉnh thoảng trả body JSON bị cắt ngang (200 nhưng không parse được) — retry
         resp = requests.post(base_url + "/chat/completions", json=payload, timeout=120,
                              headers={"Authorization": "Bearer " + key})
+        if resp.status_code in {429, 502, 503} and attempt < 2:
+            delay = retry_delay_seconds(resp, attempt)
+            print(f"\n[provider HTTP {resp.status_code}; retry sau {delay:g}s]", flush=True)
+            time.sleep(delay)
+            continue
         resp.raise_for_status()
         try:
             data = resp.json()
