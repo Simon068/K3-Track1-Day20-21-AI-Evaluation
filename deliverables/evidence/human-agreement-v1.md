@@ -19,6 +19,14 @@ python eval/agreement.py labels-tran-kien.csv labels-nguyen-phu-quang.csv
 | `sc-c13-a` | uncertain | fail | Chờ hai thành viên thảo luận và ghi lý do mỗi phía |
 | `sc-c20-a` | pass | fail | Chờ hai thành viên thảo luận và ghi lý do mỗi phía |
 
-`labels-consensus-draft.csv` chỉ chép 23 nhãn hai người đã đồng thuận và để trống
-hai case trên. Không được đổi tên thành `labels.csv` hoặc dùng calibrate judge trước
-khi hai thành viên tự chốt nhãn vàng và note.
+## Quyết định sau đồng thuận
+
+Nhóm chốt gold labels:
+
+- `sc-c04-a`: `fail` — `fail: schema — JSON không parse được`.
+- `sc-c13-a`: `uncertain` — tutor đã từ chối giá hiện hành nhưng vẫn đưa claim
+  `< $30/1M tokens` không có source.
+- `sc-c20-a`: `pass`.
+
+Gold labels được lưu tại `deliverables/evidence/labels.csv`. Hai file độc lập phía
+trên vẫn được giữ nguyên để bảo toàn evidence agreement trước đồng thuận.

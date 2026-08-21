@@ -174,8 +174,9 @@ python eval/judge.py --prompt eval/judge_prompts/followup-quality-v1.md --output
 - Human–human agreement trước đồng thuận: **23/25 = 92%**. Hai disagreement là
   `sc-c13-a` (uncertain/fail) và `sc-c20-a` (pass/fail). Evidence:
   `deliverables/evidence/human-agreement-v1.md`.
-- Chưa được gọi là gold labels cho tới khi hai thành viên tự thảo luận hai case trên
-  và ghi quyết định vào `labels.csv`.
+- Sau thảo luận, nhóm chốt gold: `sc-c04-a` fail vì schema không parse được;
+  `sc-c13-a` uncertain vì đã từ chối giá hiện hành nhưng vẫn đưa claim không có
+  source; `sc-c20-a` pass. Gold được lưu tại `deliverables/evidence/labels.csv`.
 - Chạy `python3 eval/judge.py`: **agreement** giữa judge và nhãn người là bao nhiêu %? Dán
   confusion matrix vào đây.
 - Judge **sai ở đâu**? (chặt quá / lỏng quá / lệch ở nhóm câu nào — in-scope hay
@@ -247,7 +248,10 @@ threshold được khóa trước candidate tiếp theo hoặc calibration evide
 
 - Agreement vòng độc lập (nhãn tổng): **92% (23/25)**.
 - Mâu thuẫn cần xử lý: `sc-c13-a` (uncertain/fail) và `sc-c20-a` (pass/fail).
-- Nhóm xử lý bằng cách nào: (siết định nghĩa / đổi thang / bỏ tiêu chí...)
+- Nhóm giữ nguyên evidence độc lập, thảo luận lại output và chốt gold labels:
+  `sc-c04-a` fail, `sc-c13-a` uncertain, `sc-c20-a` pass. Case `sc-c04-a` làm rõ
+  schema parse failure là blocker; `sc-c13-a` giữ uncertain vì boundary scope và
+  unsupported claim chưa được rubric phân định đủ rõ.
 
 #### 3. LLM judge
 

@@ -31,7 +31,8 @@ python eval/report.py
 - [x] Đã nhận và chuẩn hóa tên file `labels-nguyen-phu-quang.csv`.
 - [x] Đã chạy `python eval/agreement.py labels-tran-kien.csv labels-nguyen-phu-quang.csv`.
 - [x] Agreement trước đồng thuận: 23/25 = 92%; disagreement: `sc-c13-a`, `sc-c20-a`.
-- [ ] Đồng thuận `labels.csv`; không để AI gắn nhãn.
+- [x] Nhóm đã tự chốt `labels.csv`: `sc-c04-a` fail, `sc-c13-a` uncertain, các row
+  còn lại pass; AI chỉ ghi lại quyết định.
 - [ ] Nếu calibrate judge theo từng tiêu chí, tạo gold files tương ứng
   `labels-groundedness.csv` và `labels-followup.csv` từ quyết định human.
 
