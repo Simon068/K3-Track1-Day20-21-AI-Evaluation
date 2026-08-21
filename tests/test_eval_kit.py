@@ -95,6 +95,13 @@ os.environ["GROQ_API_KEY"] = "test-key-groq"
 b, k, m = tutor.resolve_provider("groq/llama-3.3-70b-versatile")
 check("groq direct", b == "https://api.groq.com/openai/v1" and
       k == "test-key-groq" and m == "llama-3.3-70b-versatile")
+reasoning_payload = {}
+tutor.apply_reasoning_config(reasoning_payload, "groq/openai/gpt-oss-120b", "low")
+check("groq reasoning dùng reasoning_effort", reasoning_payload == {"reasoning_effort": "low"})
+reasoning_payload = {}
+tutor.apply_reasoning_config(reasoning_payload, "openrouter/openai/gpt-5-mini", "minimal")
+check("openrouter reasoning dùng object effort",
+      reasoning_payload == {"reasoning": {"effort": "minimal"}})
 b, k, m = tutor.resolve_provider("openrouter/anthropic/claude-x")
 check("openrouter giữ nguyên id 2 đoạn", m == "anthropic/claude-x" and "openrouter.ai" in b)
 tutor.BASE_URL = "https://gw.example/v1"

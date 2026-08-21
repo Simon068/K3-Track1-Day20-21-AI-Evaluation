@@ -196,6 +196,16 @@ def chat_response_error(data):
     return "response không có choices" + (f": {message}" if message else "")
 
 
+def apply_reasoning_config(payload, model, reasoning_effort):
+    """Groq dùng reasoning_effort; OpenRouter dùng object reasoning."""
+    if not reasoning_effort:
+        return
+    if model.startswith("groq/"):
+        payload["reasoning_effort"] = reasoning_effort
+    else:
+        payload["reasoning"] = {"effort": reasoning_effort}
+
+
 def chat(messages, model=None, temperature=0, max_tokens=800, tools=None,
          reasoning_effort=None):
     model = model or MODEL
@@ -209,8 +219,7 @@ def chat(messages, model=None, temperature=0, max_tokens=800, tools=None,
             "(Muốn đi qua gateway riêng? Đặt EVAL_BASE_URL + EVAL_API_KEY.)")
     payload = {"model": model_id, "messages": messages,
                "temperature": temperature, "max_tokens": max_tokens}
-    if reasoning_effort:
-        payload["reasoning"] = {"effort": reasoning_effort}
+    apply_reasoning_config(payload, model, reasoning_effort)
     if "deepseek-v4" in model:  # bắt buộc với deepseek v4: tắt thinking, nếu không mất output
         payload["thinking"] = {"type": "disabled"}
     # ép JSON: đo thực tế ~20% response không có cờ này bị vỡ JSON giữa chừng.
