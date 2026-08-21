@@ -9,13 +9,14 @@ Không điền giả các mục dưới đây. Đây là phần hai thành viên
 
 ## A. Trước live run
 
-- [ ] Điền ít nhất một provider key tương thích với `EVAL_MODEL` trong `.env`.
-- [ ] Chọn tutor model và judge model khác họ; ghi model/version/ngày.
-- [ ] Điền `BRAINTRUST_API_KEY` hoặc `LANGSMITH_API_KEY` thật.
+- [x] Có `OPENROUTER_API_KEY` tương thích với model trong `.env`.
+- [x] Tutor `openrouter/deepseek/deepseek-v4-flash`; judge dự kiến
+  `openrouter/openai/gpt-5-mini` — khác họ model, ghi nhận ngày 2026-08-21.
+- [x] Có `LANGSMITH_API_KEY`; project `ai-evaluation`.
 - [ ] Ghi trace project link vào `deliverables/evidence/braintrust-link.md`.
 
-Hiện trạng được kiểm tra ngày 2026-08-21: `.env` có OpenRouter key nhưng model mặc
-định vẫn cần DeepSeek/OpenAI key; chưa có tracing key. Không chạy live trước khi sửa.
+Live run đã log 25 traces lên LangSmith. Không ghi giá trị API key vào evidence hoặc
+commit; chỉ còn thiếu URL project/run để làm minh chứng có thể mở được.
 
 ## B. Human baseline
 
@@ -25,8 +26,9 @@ Copy-Item results.jsonl deliverables/evidence/results-v1.jsonl
 python eval/report.py
 ```
 
-- [ ] Hai người chấm độc lập cùng 15–20 row, không xem nhãn nhau.
-- [ ] Lưu `labels-tran-kien.csv` và `labels-nguyen-phu-quang.csv`.
+- [x] Trần Kiên đã chấm độc lập 25/25 row; file `labels-tran-kien.csv` hợp lệ.
+- [ ] Nguyễn Phú Quang chấm độc lập cùng 25 row, không xem nhãn của Trần Kiên.
+- [ ] Nhận `labels-nguyen-phu-quang.csv`.
 - [ ] Chạy `python eval/agreement.py labels-tran-kien.csv labels-nguyen-phu-quang.csv`.
 - [ ] Ghi agreement trước đồng thuận và từng disagreement case.
 - [ ] Đồng thuận `labels.csv`; không để AI gắn nhãn.
@@ -41,7 +43,9 @@ python eval/judge.py --prompt eval/judge_prompts/groundedness-v1.md --output ver
 python eval/judge.py --prompt eval/judge_prompts/followup-quality-v1.md --output verdicts-followup-v1.jsonl --labels labels-followup.csv
 ```
 
-- [ ] Lưu confusion matrix, TPR/TNR và disagreement pattern vòng 1.
+- [x] Đã chạy code checks trên `results-v1.jsonl`: schema 24/25; citation ID 24/24;
+  quote-verbatim 7/24; scope/source contract 24/24; follow-up contract 24/24.
+- [ ] Lưu confusion matrix, TPR/TNR và disagreement pattern judge vòng 1.
 - [ ] Mỗi lần chỉ sửa một yếu tố prompt; lưu prompt/verdicts trước khi chạy lại.
 - [ ] Chạy tối thiểu hai vòng mỗi judge.
 - [ ] So kết quả judge với human–human agreement ceiling.

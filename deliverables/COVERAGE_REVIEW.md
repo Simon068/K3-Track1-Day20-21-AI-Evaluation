@@ -1,8 +1,8 @@
 # Coverage review — VLearn AI Tutor
 
-> Trạng thái: **AI draft, chưa phải Dataset v1**. Nhóm phải review và đánh dấu
-> `Keep / Rewrite / Reject`. Chỉ các scenario được nhóm giữ mới được paraphrase và
-> ghi vào `dataset.jsonl`.
+> Trạng thái: **đã được nhóm human-review ngày 2026-08-21**. Nhóm loại
+> `C01, C02, C09, C10, C12`, sửa `C18, C20` và giữ 15 combinations để tạo
+> Dataset v1 gồm 25 inputs.
 
 ## 1. Data và căn cứ được lấy từ đâu?
 
@@ -62,9 +62,9 @@ rate/threshold (`s47–s50`), judge/calibration (`s52–s59`), các loại grade
 | C15 | so sánh · rải nhiều nguồn · nhiều ý · ôn lại | câu dài, vừa hỏi code/LLM/human vừa hỏi chi phí | Tách tiêu chí; so sánh strengths/limits và routing | trả lời sót hoặc gán lane sai | challenge | **Keep** |
 | C16 | đọc kết quả · chỉ một phần · rõ · đang làm lab | hỏi “agreement bao nhiêu là chắc chắn đủ?” | Nêu mốc chỉ là tham chiếu, cần human ceiling và error pattern; không biến thành luật tuyệt đối | áp threshold máy móc | challenge | **Keep** |
 | C17 | áp dụng · rải nhiều nguồn · mơ hồ · không context | “lấy data nào để test?” | Hỏi use case/stage; nêu nguồn dog-food, thumbs-down, manual failures và giới hạn synthetic | dataset đồng nhất, không phản ánh use case | representative | **Keep** |
-| C18 | khái niệm · có trực tiếp · rõ · có slide `s32` | dùng viết tắt và typo: “trace vs log khac j” | Hiểu intent, giải thích trace theo corpus và cite đúng | fail với input tự nhiên | representative | **rewrite** |
+| C18 | khái niệm · có trực tiếp · rõ · có slide `s32` | dùng viết tắt và typo: “trace vs log khac j” | Hiểu intent, giải thích trace theo corpus và cite đúng | fail với input tự nhiên | representative | **Rewrite → Keep after rewrite** |
 | C19 | áp dụng · có trực tiếp · nhiều ý · đang làm lab | vừa xin code check vừa xin judge prompt | Tách deterministic rules khỏi semantic criteria; hướng dẫn đúng thứ tự lane | judge chấm việc code làm chắc hơn | challenge | **Keep** |
-| C20 | đọc kết quả · có trực tiếp · false premise · có slide `s58` | cho rằng hai vòng judge không tăng thì cứ sửa lớn prompt | Giải thích ceiling, đổi ít một và cân nhắc chuyển lane | overfit judge, mất dấu causal change | high-risk | **rewrite** |
+| C20 | đọc kết quả · có trực tiếp · false premise · có slide `s58` | cho rằng hai vòng judge không tăng thì cứ sửa lớn prompt | Giải thích ceiling, đổi ít một và cân nhắc chuyển lane | overfit judge, mất dấu causal change | high-risk | **Rewrite → Keep after rewrite** |
 
 ## 4. Cách review
 

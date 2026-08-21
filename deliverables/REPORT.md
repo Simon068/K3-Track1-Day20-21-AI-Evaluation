@@ -67,7 +67,7 @@ results-vN.jsonl, labels.csv, judge-prompt-vN.md, verdicts-vN.jsonl, braintrust-
   toàn bộ”, 25 paraphrase được ghi `keep_human_2026-08-21`. Cần hai thành viên đọc
   lại trước live run nếu đây chưa phản ánh quyết định chung của cả nhóm.
 - Blind spots: chưa có production distribution, hội thoại nhiều lượt, lỗi retrieval
-  từ trace thật, input hoàn toàn tiếng Anh và case source conflict/stale corpus.
+  từ trace thật, input tiếng Anh/mixed-language và case source conflict/stale corpus.
 - **Checkpoint human còn thiếu:** nếu chỉ giữ 10 rows, nhóm phải tự chọn và ghi lý do;
   AI không quyết định thay mục này.
 
@@ -169,7 +169,9 @@ python eval/judge.py --prompt eval/judge_prompts/followup-quality-v1.md --output
 > Judge chỉ đáng tin khi đã calibrate với chuẩn vàng của con người. Đây là minh chứng
 > cho việc đó.
 
-- Bạn đã **gán nhãn tay** bao nhiêu row? **0 — đang chờ hai người chấm độc lập.**
+- Trần Kiên đã **gán nhãn tay 25/25 row**: 23 pass, 1 fail, 1 uncertain. Đây mới là
+  một rater độc lập; chưa được gọi là gold labels cho tới khi Nguyễn Phú Quang chấm
+  xong và nhóm xử lý disagreement.
 - Chạy `python3 eval/judge.py`: **agreement** giữa judge và nhãn người là bao nhiêu %? Dán
   confusion matrix vào đây.
 - Judge **sai ở đâu**? (chặt quá / lỏng quá / lệch ở nhóm câu nào — in-scope hay
@@ -209,14 +211,20 @@ Checkpoint bắt buộc trước khi điền mục này:
 
 ### Scorecard
 
+Tutor run v1 đã có 25 traces trong `deliverables/evidence/results-v1.jsonl`:
+24 output parse được, 1 parse error; tổng chi phí `$0.309661`; latency trung bình
+`33.44s/row`. Đây là số liệu vận hành, chưa phải scorecard chất lượng vì còn thiếu
+gold labels và judge calibration.
+
 | Tiêu chí | Pass | Fail | Uncertain | Pass rate |
 |---|---|---|---|---|
 | | | | | |
 
 ### Quyết định gate
 
-**CHƯA ĐƯỢC PHÉP QUYẾT ĐỊNH** — threshold phải do nhóm khóa trước khi xem candidate
-results; hiện chưa có live result, gold labels hoặc calibration evidence.
+**CHƯA ĐƯỢC PHÉP QUYẾT ĐỊNH** — đã có live results v1, nhưng chưa có gold labels,
+threshold được khóa trước candidate tiếp theo hoặc calibration evidence. Nhóm cần
+đặt threshold trước khi chạy candidate v2; không được hồi tố threshold cho v1.
 
 ---
 
